@@ -1,0 +1,14 @@
+# Artifacts
+docs/decisions.md
+.claude/
+INSTRUCTIONS.md
+src/test.json
+!bench
+
+# Rust build artifacts
+target/
+**/*.rs.bk
+
+# Editor / OS
+*.swp
+.DS_Store

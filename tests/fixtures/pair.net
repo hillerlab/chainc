@@ -1,0 +1,9 @@
+net chr1 160
+ fill 0 140 qry + 0 140 id 1 score 10000
+  gap 10 35 qry + 10 35
+   fill 20 20 qry + 20 20 id 2 score 6000
+  gap 55 30 qry + 55 30
+   fill 60 20 qry + 60 20 id 2 score 6000
+  gap 95 35 qry + 95 35
+   fill 100 20 qry + 100 20 id 2 score 6000
+

@@ -1,0 +1,38 @@
+[package]
+name = "chainc"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.85"
+license = "GPL-3.0"
+description = "Remove chain-breaking alignments using chain/net files"
+repository = "https://github.com/alejandrogzi/chainc"
+default-run = "chainc"
+
+[lib]
+name = "chainc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "chainc"
+path = "src/main.rs"
+
+[dependencies]
+chaintools = { version = "0.0.9", features = ["mmap", "parallel", "sequence", "write", "gzip"] }
+netools = { version = "0.0.2", features = [
+    "mmap",
+    "parallel",
+    "index",
+    "gzip",
+    "write",
+    "chainnet",
+] }
+clap = { version = "4", features = ["derive"] }
+flate2 = { version = "1", default-features = false, features = ["zlib-rs"] }
+rayon = "1"
+thiserror = "2"
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+strip = true

@@ -1,0 +1,10 @@
+#fixture=single-removal
+chain 10000 chr1 120 + 0 100 qry 120 + 0 100 1
+10	35	35
+10	35	35
+10
+
+chain 60000 chr1 120 + 20 80 qry 120 + 20 80 2
+20	20	20
+20
+
