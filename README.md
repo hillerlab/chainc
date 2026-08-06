@@ -58,6 +58,24 @@
 
 ---
 
+## Installation
+### Binary
+```bash
+cargo install --all-features chainc
+```
+
+### Docker
+```bash
+docker pull ghcr.io/hillerlab/chainc:latest
+```
+
+### Conda
+```bash
+conda install -c bioconda chainc
+```
+
+---
+
 # Benchmarks
 
 See [bench.md](assets/docs/bench.md) for full details.
