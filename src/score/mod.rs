@@ -18,14 +18,6 @@ pub struct SubchainMetrics {
     pub aligned_bases: u64,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MetricsKey {
-    pub chain_id: u64,
-    pub revision: u32,
-    pub start: u32,
-    pub end: u32,
-}
-
 #[derive(Debug, Clone)]
 pub struct SequenceSet {
     reference: SequenceResolver,

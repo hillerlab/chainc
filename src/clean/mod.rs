@@ -11,7 +11,7 @@ use crate::chain::{EditableChain, OriginalChain, SubchainView};
 use crate::config::CleanerConfig;
 use crate::error::{Error, Result};
 use crate::output;
-use crate::score::{MetricsKey, ParityScorer, SequenceSet, SubchainMetrics};
+use crate::score::{ParityScorer, SequenceSet, SubchainMetrics};
 
 #[derive(Debug)]
 pub struct RemovalEvent {
@@ -37,7 +37,6 @@ pub struct Cleaner {
     originals: Vec<OriginalChain>,
     maximum_chain_id: u64,
     scorer: ParityScorer,
-    metrics_cache: HashMap<MetricsKey, SubchainMetrics>,
     events: Vec<RemovalEvent>,
     removed_bed: Vec<String>,
     id_dictionary: Vec<String>,
@@ -69,7 +68,6 @@ impl Cleaner {
             originals,
             maximum_chain_id,
             scorer: ParityScorer::new(matrix, gaps, sequences),
-            metrics_cache: HashMap::new(),
             events: Vec::new(),
             removed_bed: Vec::new(),
             id_dictionary: Vec::new(),
@@ -233,7 +231,9 @@ impl Cleaner {
                 .ok_or_else(|| Error::Overflow("suspect data ID".into()))?;
             self.suspect_data.push(format!(
                 "{}\t{}\t{}\t{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
-                String::from_utf8_lossy(candidate.reference_name.as_ref()),
+                String::from_utf8_lossy(
+                    self.discovery.reference_names[candidate.net_id as usize].as_ref()
+                ),
                 candidate.suspect.start,
                 candidate.suspect.end,
                 self.suspect_id,
@@ -291,12 +291,6 @@ impl Cleaner {
             .chains
             .get(&chain_id)
             .ok_or_else(|| Error::Consistency(format!("missing chain ID {chain_id}")))?;
-        let key = MetricsKey {
-            chain_id,
-            revision: chain.revision,
-            start: range.start,
-            end: range.end,
-        };
         let Some(view) = chain.subset_on_reference(range.start, range.end) else {
             if optional {
                 return Ok(None);
@@ -306,13 +300,9 @@ impl Cleaner {
                 range.start, range.end
             )));
         };
-        if let Some(metrics) = self.metrics_cache.get(&key).copied() {
-            return Ok(Some((view, metrics)));
-        }
         let spans_whole_chain =
             range.start <= chain.reference_start && range.end >= chain.reference_end;
         let metrics = self.scorer.score(chain, &view)?;
-        self.metrics_cache.insert(key, metrics);
         if spans_whole_chain {
             // `chainSubsetOnT` returns the original chain when the requested
             // interval covers it, and `getChainScore` then writes the freshly
@@ -360,7 +350,7 @@ impl Cleaner {
 
         self.removed_bed.push(format!(
             "{}\t{}\t{}\tbreakingChainID_{}_Score_{}_brokenChainID_{}_Score_{}_suspectLocalScore_{}_RatioL_{:.2}_RatioR_{:.2}\t1000\t+\t{}\t{}\t{}",
-            String::from_utf8_lossy(candidate.reference_name.as_ref()),
+            String::from_utf8_lossy(self.discovery.reference_names[candidate.net_id as usize].as_ref()),
             candidate.suspect.start,
             candidate.suspect.end,
             candidate.breaking_chain_id,
@@ -511,7 +501,6 @@ fn pair_candidate(upstream: &BreakCandidate, downstream: &BreakCandidate) -> Bre
         ordinal: upstream.ordinal,
         net_id: upstream.net_id,
         depth: upstream.depth,
-        reference_name: upstream.reference_name.clone(),
         broken_chain_id: upstream.broken_chain_id,
         breaking_chain_id: upstream.breaking_chain_id,
         left_fill: upstream.left_fill.clone(),
@@ -531,7 +520,6 @@ mod tests {
             ordinal: 0,
             net_id: 0,
             depth: 2,
-            reference_name: std::sync::Arc::from(&b"chr1"[..]),
             broken_chain_id: 2,
             breaking_chain_id: 1,
             left_fill: left - 20..left - 10,
