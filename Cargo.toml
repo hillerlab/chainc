@@ -1,6 +1,6 @@
 [package]
 name = "chainc"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 rust-version = "1.85"
 license = "GPL-3.0"
@@ -17,8 +17,8 @@ name = "chainc"
 path = "src/main.rs"
 
 [dependencies]
-chaintools = { version = "0.0.9", features = ["mmap", "parallel", "sequence", "write", "gzip"] }
-netools = { version = "0.0.2", features = [
+chaintools = { version = "0.0.12", features = ["mmap", "parallel", "sequence", "write", "gzip"] }
+netools = { version = "0.0.3", features = [
     "mmap",
     "parallel",
     "index",

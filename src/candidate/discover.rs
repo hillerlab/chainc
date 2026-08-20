@@ -17,7 +17,6 @@ pub struct BreakCandidate {
     pub ordinal: u64,
     pub net_id: u32,
     pub depth: u16,
-    pub reference_name: Arc<[u8]>,
     pub broken_chain_id: u64,
     pub breaking_chain_id: u64,
     pub left_fill: Range<u32>,
@@ -39,6 +38,7 @@ pub struct CandidateDiscovery {
     pub groups: Vec<CandidateGroup>,
     pub interest_chain_ids: HashSet<u64>,
     pub net_chain_ids: HashSet<u64>,
+    pub reference_names: Vec<Arc<[u8]>>,
 }
 
 impl CandidateDiscovery {
@@ -54,7 +54,9 @@ impl CandidateDiscovery {
                     candidate.ordinal,
                     candidate.breaking_chain_id,
                     candidate.broken_chain_id,
-                    String::from_utf8_lossy(candidate.reference_name.as_ref()),
+                    String::from_utf8_lossy(
+                        self.reference_names[candidate.net_id as usize].as_ref()
+                    ),
                     candidate.depth,
                     candidate.left_fill.start,
                     candidate.left_fill.end,
@@ -84,13 +86,13 @@ where
     let mut contexts_by_chain: HashMap<u64, Vec<OrderedContext>> = HashMap::new();
     let mut nested_chain_insertion_order = Vec::new();
     let mut indexes = HashMap::new();
-    let mut reference_names: HashMap<u32, Arc<[u8]>> = HashMap::new();
+    let mut reference_names: Vec<Arc<[u8]>> = Vec::new();
     let mut net_chain_ids = HashSet::new();
 
     for (ordinal, net) in sections.into_iter().enumerate() {
         let net_id = u32::try_from(ordinal)
             .map_err(|_| Error::Overflow("more than 2^32-1 NET sections".into()))?;
-        reference_names.insert(net_id, Arc::from(net.reference_name_bytes()));
+        reference_names.push(Arc::from(net.reference_name_bytes()));
         net_chain_ids.extend(net.used_chain_ids());
         let mut spans = Vec::new();
         for fill in net.fills() {
@@ -113,7 +115,7 @@ where
     let mut next_ordinal = 0u64;
 
     for broken_chain_id in broken_chain_order {
-        let Some(contexts) = contexts_by_chain.get(&broken_chain_id) else {
+        let Some(contexts) = contexts_by_chain.remove(&broken_chain_id) else {
             continue;
         };
         if contexts.len() < 2 {
@@ -156,7 +158,7 @@ where
                     broken_chain_id,
                     String::from_utf8_lossy(
                         reference_names
-                            .get(&left.net_id)
+                            .get(left.net_id as usize)
                             .map(Arc::as_ref)
                             .unwrap_or(b"?")
                     )
@@ -167,10 +169,6 @@ where
                 ordinal: next_ordinal,
                 net_id: left.net_id,
                 depth: left.context.depth,
-                reference_name: reference_names
-                    .get(&left.net_id)
-                    .cloned()
-                    .ok_or_else(|| Error::Consistency("missing NET reference name".into()))?,
                 broken_chain_id,
                 breaking_chain_id,
                 left_fill: left.context.fill_range.start..left.context.fill_range.end,
@@ -214,5 +212,6 @@ where
         groups,
         interest_chain_ids,
         net_chain_ids,
+        reference_names,
     })
 }

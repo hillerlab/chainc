@@ -3,7 +3,17 @@ docs/decisions.md
 .claude/
 INSTRUCTIONS.md
 src/test.json
-!bench
+# Benchmark binaries and downloaded/intermediate data (regenerable).
+# Scripts and 2bit fixtures under bench/ are tracked.
+bench/bin/
+bench/*.2bit
+bench/*.fa.gz
+bench/*.chain
+bench/*.net
+bench/*.net.raw
+bench/*.sizes
+bench/*.log
+out/
 
 # Rust build artifacts
 target/

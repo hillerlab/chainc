@@ -60,7 +60,7 @@ dependencies = [
 
 [[package]]
 name = "chainc"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "chaintools",
  "clap",
@@ -72,9 +72,9 @@ dependencies = [
 
 [[package]]
 name = "chaintools"
-version = "0.0.9"
+version = "0.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "70b41c7b71707c98b706d9c72d787a14fe6f58b2d3466acc6f5c9a018d41daed"
+checksum = "209046c222a8f336acffed2def818b8fd818b75eb8b1b654667d0f129008c86f"
 dependencies = [
  "flate2",
  "memchr",
@@ -215,9 +215,9 @@ dependencies = [
 
 [[package]]
 name = "netools"
-version = "0.0.2"
+version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8b4d42e9173856cf98ee97eb9c676c7d62cc7eb904670ebb4b6cc4dc6d28c54"
+checksum = "4aeb041d4206048c8a535427ccb741f79d15768817feb5809c57393ffb67f4d9"
 dependencies = [
  "chaintools",
  "flate2",
