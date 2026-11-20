@@ -53,6 +53,24 @@
 </p>
 
 
+## 0.0.3 - 2026-11-20
+
+### Changed
+
+- Bumped `chaintools` from 0.0.12 to 0.0.14 and `netools` from 0.0.3 to 0.0.4.
+  Sequences are now loaded with the one-pass 2bit loader of `chaintools`
+  0.0.14, which reads version 1 `.2bit` files (64-bit offsets, written by
+  `faToTwoBit -long` for genomes above 4 Gb). Earlier releases stopped on them
+  with `Unsupported version: Versions larger than 0 are not supported`.
+- No source change. Output is byte-identical to 0.0.1 and 0.0.2 (chain,
+  `removed.bed`, `newChainIDDict`) on version 0 `.2bit` and FASTA input.
+
+### Known limitation
+
+- Without `--reference-sizes` / `--query-sizes` and without `--net`, sizes are
+  read from the `.2bit` index through `netools`, which still rejects version 1
+  files. Pass the size files (or a NET) for such genomes.
+
 ## 0.0.1 - 2026-08-06
 
 First release: a Rust port of UCSC `chainCleaner`.
